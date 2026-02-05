@@ -7,6 +7,7 @@ return {
   {
     -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
+    enabled = false,
   },
   {
     -- Powerful Git integration for Vim
@@ -40,5 +41,14 @@ return {
     config = function()
       require('colorizer').setup()
     end,
+  },
+  {
+    "akinsho/git-conflict.nvim",
+    version = "*",
+    config = true,
+  },
+  {
+    "lewis6991/gitsigns.nvim",
+    config = true
   },
 }

@@ -1,6 +1,8 @@
 require 'core.options'
 require 'core.keymaps'
 
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
@@ -13,31 +15,10 @@ end
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 
-require('lazy').setup({
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-      "nvim-tree/nvim-web-devicons", -- optional, but recommended
-    },
-    lazy = false, -- neo-tree will lazily load itself
-  },
-    require 'plugins.colortheme',
-    require 'plugins.wakatime',
-    require 'plugins.bufferline',
-    require 'plugins.lualine',
-    require 'plugins.treesitter',
-    require 'plugins.telescope',
-    require 'plugins.lsp',
-    require 'plugins.autocompletion',
-    require 'plugins.autoformatting',
-    require 'plugins.gitsigns',
-    require 'plugins.indent-blankline',
-    require 'plugins.misc'
-})
+require('lazy').setup("plugins")
 
+vim.opt.number = true
+vim.opt.relativenumber = true
 vim.api.nvim_create_autocmd('TermOpen', {
   group = vim.api.nvim_create_augroup('custom-term-open', { clear = true }),
   callback = function()
