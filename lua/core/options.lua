@@ -14,3 +14,19 @@ vim.opt.wrap = true
 vim.opt.linebreak = true
 vim.opt.breakindent = true
 vim.opt.breakindentopt = 'shift:2'
+
+vim.diagnostic.config {
+  float = {
+    border = 'rounded',
+    source = true,
+  },
+  severity_sort = true,
+  signs = true,
+  underline = {
+    severity = {
+      min = vim.diagnostic.severity.WARN,
+    },
+  },
+  update_in_insert = false,
+  virtual_text = false,
+}

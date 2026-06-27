@@ -2,40 +2,52 @@ return {
     'nvimtools/none-ls.nvim',
     dependencies = {
         'nvimtools/none-ls-extras.nvim',
-        'jayp0521/mason-null-ls.nvim', -- ensure dependencies are instaled
+        'jayp0521/mason-null-ls.nvim',
     },
     config = function()
         local null_ls = require 'null-ls'
-        local diagnostics = null_ls.builtins.diagnostics -- to setup linters
+        local diagnostics = null_ls.builtins.diagnostics
 
-        -- Formatters & linters for mason to install
+        -- Tools installed via Mason (used by conform.nvim and none-ls)
         require('mason-null-ls').setup {
             ensure_installed = {
-                'prettier', -- ts/js formatter
-                'eslint_d', --ts/js linter
-                'ruff', -- python linter and formatter
-                'stylua', -- lua formatter
-                'shfmt', -- shell formatter
-                'phpcs', -- php linter
-                'phpcbf', -- php formatter
-                'pint',  -- Laravel pint
-                'google_java_format', -- java formatter
+                'prettier',
+                'eslint_d',
+                'ruff',
+                'stylua',
+                'shfmt',
+                'phpcs',
+                'phpcbf',
+                'google_java_format',
             },
             automatic_installation = true,
         }
 
-        local sources = {
-            diagnostics.checkmake,
-            diagnostics.phpcs.with {
-                extra_args = {
-                    '--standard=PSR12',
-                },
-            },
-        }
+        local is_wordpress = function(utils)
+            return utils.root_has_file { 'wp-config.php', 'wp-config-sample.php' }
+        end
 
         null_ls.setup {
-            -- debug = true -- Enable debug mode. Inspect logs with :NullLsLog.
-            sources = sources,
+            sources = {
+                diagnostics.checkmake,
+
+                -- PHP: PSR12 for standard projects, WordPress standard for WP projects
+                diagnostics.phpcs.with {
+                    extra_args = { '--standard=PSR12' },
+                    condition = function(utils) return not is_wordpress(utils) end,
+                },
+                diagnostics.phpcs.with {
+                    extra_args = { '--standard=WordPress' },
+                    condition = is_wordpress,
+                },
+
+                -- JS/TS: only in projects with an eslint config
+                require('none-ls.diagnostics.eslint_d').with {
+                    condition = function(utils)
+                        return utils.root_has_file { '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', 'eslint.config.js', 'eslint.config.mjs' }
+                    end,
+                },
+            },
         }
     end,
 }

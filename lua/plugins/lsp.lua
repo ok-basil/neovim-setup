@@ -130,29 +130,15 @@ return {
           },
         },
       },
-      jdtls = {
-        cmd = { vim.fn.stdpath('data') .. '/mason/bin/jdtls' },
-        root_dir = function(fname)
-          local util = require('lspconfig.util')
-            return util.root_pattern('pom.xml', 'build.gradle', '.git')(fname)
-        end,
-        settings = {
-          java = {
-            configuration = {
-              runtime = {
-                {
-                  name = 'JavaSE-17',
-                  path = vim.fn.expand '$JAVA_HOME',
-                },
-              },
-            },
-          },
-        },
-      },
     }
 
     local ensure_installed = vim.tbl_keys(servers or {})
-    vim.list_extend(ensure_installed, { 'jdtls' })
+    vim.list_extend(ensure_installed, {
+      'jdtls',
+      'java-debug-adapter',
+      'java-test',
+      'google-java-format',
+    })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
     -- New LSP API usage
