@@ -5,6 +5,22 @@ return {
 		local lint = require("lint")
 		local utils = require("core.utils")
 
+		local eslint_filetypes = {
+			javascript = true,
+			javascriptreact = true,
+			typescript = true,
+			typescriptreact = true,
+		}
+
+		local eslint_markers = {
+			".eslintrc",
+			".eslintrc.js",
+			".eslintrc.cjs",
+			".eslintrc.json",
+			"eslint.config.js",
+			"eslint.config.mjs",
+		}
+
 		lint.linters_by_ft = {
 			javascript = { "eslint_d" },
 			javascriptreact = { "eslint_d" },
@@ -27,6 +43,11 @@ return {
 		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 			group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
 			callback = function()
+				local bufname = vim.api.nvim_buf_get_name(0)
+				if eslint_filetypes[vim.bo.filetype] and not utils.project_root(bufname, eslint_markers) then
+					return
+				end
+
 				lint.try_lint()
 			end,
 		})
