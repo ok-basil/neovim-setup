@@ -1,41 +1,34 @@
 return {
-    'nvimtools/none-ls.nvim',
-    dependencies = {
-        'nvimtools/none-ls-extras.nvim',
-        'jayp0521/mason-null-ls.nvim', -- ensure dependencies are instaled
-    },
-    config = function()
-        local null_ls = require 'null-ls'
-        local diagnostics = null_ls.builtins.diagnostics -- to setup linters
+	"mfussenegger/nvim-lint",
+	event = { "BufReadPre", "BufNewFile" },
+	config = function()
+		local lint = require("lint")
+		local utils = require("core.utils")
 
-        -- Formatters & linters for mason to install
-        require('mason-null-ls').setup {
-            ensure_installed = {
-                'prettier', -- ts/js formatter
-                'eslint_d', --ts/js linter
-                'ruff', -- python linter and formatter
-                'stylua', -- lua formatter
-                'shfmt', -- shell formatter
-                'phpcs', -- php linter
-                'phpcbf', -- php formatter
-                'pint',  -- Laravel pint
-                'google_java_format', -- java formatter
-            },
-            automatic_installation = true,
-        }
+		lint.linters_by_ft = {
+			javascript = { "eslint_d" },
+			javascriptreact = { "eslint_d" },
+			typescript = { "eslint_d" },
+			typescriptreact = { "eslint_d" },
+			php = { "phpcs" },
+			make = { "checkmake" },
+		}
 
-        local sources = {
-            diagnostics.checkmake,
-            diagnostics.phpcs.with {
-                extra_args = {
-                    '--standard=PSR12',
-                },
-            },
-        }
+		local phpcs = lint.linters.phpcs
+		local default_phpcs_args = vim.deepcopy(phpcs.args)
 
-        null_ls.setup {
-            -- debug = true -- Enable debug mode. Inspect logs with :NullLsLog.
-            sources = sources,
-        }
-    end,
+		phpcs.args = function()
+			local args = vim.deepcopy(default_phpcs_args)
+			local standard = utils.is_wordpress_project(vim.api.nvim_buf_get_name(0)) and "WordPress" or "PSR12"
+			table.insert(args, 2, "--standard=" .. standard)
+			return args
+		end
+
+		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+			group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
+			callback = function()
+				lint.try_lint()
+			end,
+		})
+	end,
 }
