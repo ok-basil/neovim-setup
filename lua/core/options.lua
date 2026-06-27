@@ -24,14 +24,14 @@ vim.diagnostic.config({
 	signs = true,
 	underline = {
 		severity = {
-			min = vim.diagnostic.severity.ERROR,
+			min = vim.diagnostic.severity.WARN,
 		},
 	},
 	update_in_insert = false,
 	virtual_text = false,
 })
 
-vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", { underline = false, sp = "NONE" })
+vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", { undercurl = true, sp = "#fabd2f" })
 vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { underline = false, sp = "NONE" })
 vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { underline = false, sp = "NONE" })
 vim.api.nvim_set_hl(0, "DiagnosticUnderlineOk", { underline = false, sp = "NONE" })
